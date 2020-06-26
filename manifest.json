@@ -5,7 +5,8 @@
 	"description": "Saving Chrome tabs schedulely",
 	"background": {
 		"scripts": [
-			"include/jquery-1.11.0.min.js",	
+			"include/jquery-1.11.0.min.js",
+			"include/qrcode.js",	
 			// "scripts/bg.js",
 			"scripts/main.js"
 		],

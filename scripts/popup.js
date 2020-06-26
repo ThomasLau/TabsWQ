@@ -18,8 +18,15 @@ function callInfo(date){
 	});
 }
 
-$(document).on("click",'#tabsKey li',function(){
+$(document).on("click",'#tabsKey li a',function(){
 	callInfo(""+this.innerText) 
+});
+
+$(document).on("click",'#tabsKey li span',function(){
+	// callInfo()
+	chrome.runtime.sendMessage("del:"+this.id, function(response){
+	    console.log('del status: ' + response);
+	});
 });
 
 $('#open_tabs_date').click(e => {
@@ -33,7 +40,8 @@ $('#open_tabs_date').click(e => {
 	chrome.runtime.sendMessage('tabs', function(response){
 	    // console.log('Value currently is ' + response);
     	$('#tabsKey').html('')
-    	response.forEach(function(item){$('#tabsKey').append('<li><a href="#">'+item+'</a></li>')})
+    	response.forEach(function(item){$('#tabsKey')
+    		.append('<li><a href="#">'+item+'</a><span id="'+item+'">D</span></li>')})
 	});
 	/*var user1 = {'name': 'diego', 'age': 18}
 	chrome.storage.sync.set({'user1': user1}, function() {
@@ -64,3 +72,20 @@ $('#change_bg').click(e => {
 	});
 });
 
+var qqrcode=null
+$('#qrcode').click(e => {
+	console.log('qrcode');
+	if (qqrcode == null) {
+		qqrcode = new QRCode(document.getElementById("tabsInfo"), {
+	      width : 100,
+	      height : 100
+        });
+	}
+	qqrcode.clear()
+	// $('#tabsInfo').html('')
+	chrome.runtime.sendMessage('cur', function(tab){
+		qqrcode.makeCode(tab.url);
+	    // console.log(response);
+	});
+	// qqrcode.makeCode("helloWorld");
+});

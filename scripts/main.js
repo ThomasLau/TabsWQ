@@ -234,7 +234,14 @@ var main = {
         /*runAsync(message, sender).then(function(data){
             sendResponse(data);
         });*/
-        if(message == 'tabs'){
+        if(message == 'cur'){
+            // sendResponse(main.queue.slice());
+            // chrome.tabs.getCurrent(function(tab) {});
+            chrome.tabs.query({currentWindow: true, active: true}, function (tabs) { // 
+              console.log(tabs.length);
+              sendResponse(tabs[0])
+            });
+        }else if(message == 'tabs'){
             sendResponse(main.queue.slice());
         }else if(message == 'clear'){
             main.queue=[]
@@ -256,6 +263,20 @@ var main = {
                 });
             }
             sendResponse("ok");
+        }else if(message.startsWith("del:")){
+            var dateStr = message.substring(4)
+            chrome.storage.local.remove(dateStr, function() {console.log('removed'+dateStr);});
+            /*var arr = new Array();
+            var link = {"u":"none", "tt":"none"}
+            arr.push(link)
+            var result = JSON.stringify(arr);
+            var ss ={};
+            ss[dateStr]=result;
+            chrome.storage.local.set(ss, function() {
+                console.log('del '+ dateStr);
+            });*/
+            main.queue.splice($.inArray(dateStr,main.queue),1);
+            sendResponse("ok");
         }else{
             /*var msg;
             chrome.storage.local.get(message, function(result) {
@@ -263,6 +284,7 @@ var main = {
                 alert(result)
             });
             sendResponse(msg);*/
+            console.log("else:"+message)
             new Promise(function(resolve, reject){
                 chrome.storage.local.get(message, function(result) {
                     msg=result[message];
@@ -284,7 +306,7 @@ main.init();
 function fn() {
     main.saveTabs();
     clearInterval(timerVar);
-    timerVar = setInterval(main.saveTabs, 60*1000);
+    timerVar = setInterval(main.saveTabs, 60*1000*60);
 };
 var timerVar = setInterval(fn, 30*1000);
 chrome.runtime.onMessage.addListener(main.onMessageListener);
